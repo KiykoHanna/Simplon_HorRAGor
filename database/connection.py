@@ -1,14 +1,17 @@
 # src/database/connection.py
 
-from sqlalchemy import create_engine
+from supabase import create_client
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("SUPABASE_DB_URL")
 
-engine = create_engine(DATABASE_URL)
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
-def get_engine():
-    return engine
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+
+def get_client():
+    return supabase

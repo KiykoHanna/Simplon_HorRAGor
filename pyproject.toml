@@ -31,6 +31,7 @@ dependencies = [
     "requests>=2.33.1",
     "selenium>=4.43.0",
     "sqlalchemy>=2.0.49",
+    "supabase>=2.30.1",
     "ultralytics>=8.4.41",
     "webdriver-manager>=4.0.2",
 ]

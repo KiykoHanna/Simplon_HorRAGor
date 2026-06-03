@@ -210,17 +210,29 @@ Informations ajoutées :
 
 Cette couche est séparée du processus de matching afin de préserver l'intégrité des entités principales.
 
-### 7. Future Data Warehouse
+### 7. Base de données (Supabase)
+Rôle dans le projet
 
-Le Gold Dataset sera chargé dans une base Supabase/PostgreSQL.
+Supabase est utilisé comme couche de persistance finale (Gold Layer) du pipeline ETL.
+Le dataset gold_movies représente la version unifiée, nettoyée et dédupliquée des données issues de plusieurs sources.
 
-Objectifs :
+Table principale : movies_gold
 
-* Stockage relationnel normalisé (3NF)
-* Recherche rapide
-* Intégration future avec pgvector
-* Support du moteur RAG
+La table contient un enregistrement unique par film, identifié par master_id (PRIMARY KEY).
 
+Exemple de structure logique :
+
+Identifiants : master_id, tmdb_id, imdb_id, movie_id
+
+Métadonnées : title, original_title, overview, tagline
+
+Qualité & scores : vote_average, vote_count, popularity, avg_rating
+
+Genres & acteurs : genres, genre_ids, actors
+
+Sources : source, source_imdb, source_kaggle, source_ml
+
+Enrichissement : url, tomatometer_score, audience_score
 ---
 
 ## Structure du projet
@@ -232,8 +244,11 @@ src/
 ├── cleaning/
 ├── matching/
 ├── merging/
-├── enrichment/
-└── database/
+└── enrichment/
+
+database/
+├── connection.py
+└── load_gold.py
 
 data/
 ├── raw/
@@ -243,38 +258,3 @@ data/
 
 ---
 
-## État d'avancement
-
-### Réalisé
-
-* Collecte automatisée depuis 5 sources de données
-* Téléchargement automatisé des datasets
-* Scraping Rotten Tomatoes
-* Normalisation des schémas
-* Nettoyage des données
-* Export Parquet et CSV
-* Construction des clés de matching
-* Matching exact entre les sources
-* Implémentation du fuzzy matching avec RapidFuzz
-* Construction du Gold Dataset
-* Mise en place de la couche d'enrichissement Rotten Tomatoes
-
-### En cours
-
-* Optimisation du matching fuzzy
-* Génération d'identifiants maîtres (Master IDs)
-* Contrôle qualité des correspondances
-* Déduplication avancée
-
-### À venir
-
-* Modélisation Merise (MCD / MLD / MPD)
-* Création de la base Supabase
-* Intégration SQLAlchemy
-* Chargement automatisé des données
-* Génération des embeddings
-* Mise en place du moteur RAG
-* Développement de l'agent conversationnel HorRAGor
-
-```
-```
