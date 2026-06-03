@@ -233,9 +233,9 @@ Genres & acteurs : genres, genre_ids, actors
 Sources : source, source_imdb, source_kaggle, source_ml
 
 Enrichissement : url, tomatometer_score, audience_score
----
 
-## Structure du projet
+
+## 8. Structure du projet
 
 ```text
 src/
@@ -261,7 +261,7 @@ scripts/
 
 ---
 
-### Exécution et vérification de la base de données (Supabase)
+### 9. Exécution et vérification de la base de données (Supabase)
 
 1. Prérequis
 
