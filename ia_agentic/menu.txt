@@ -1,0 +1,25 @@
+--- DRINKS ---
+Coffee - 2€
+Tea - 2€
+Water (still) - 1.5€
+Water (sparkling) - 2€
+
+--- PIZZAS ---
+Pizza Margherita - 10€
+Pizza Pepperoni - 12€
+Pizza 4 Fromages - 13€
+Pizza Vegetarienne - 11€
+
+--- BURGERS ---
+Burger Classic - 8€
+Burger Cheese - 9€
+Burger Chicken - 9.5€
+
+--- SALADS ---
+Salad Caesar - 7€
+Salad Greek - 7.5€
+
+--- DESSERTS ---
+Chocolate Cake - 5€
+Cheesecake - 5.5€
+Ice Cream - 4€

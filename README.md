@@ -1,0 +1,280 @@
+# HorRAGor BOT Partie 1
+---
+
+L'objectif de ce projet est de concevoir HorRAGor (ou GorRAGor), un agent conversationnel spécialisé dans l'univers de l'horreur (cinéma, littérature, jeux vidéo). Pour que cet agent soit pertinent et évite les hallucinations, il doit s'appuyer sur une base de connaissances hybride, riche et parfaitement structurée.
+
+## Ingestion Multimodale et Pipeline de Données Massives
+
+# Pipeline d'Ingestion des Données
+
+## Objectif
+
+Cette première étape du projet HorRAGor consiste à construire une couche d'ingestion capable de collecter des données issues de plusieurs sources hétérogènes liées à l'univers du cinéma d'horreur. Ces données serviront de fondation à la future architecture RAG (Retrieval-Augmented Generation).
+
+## Sources de données intégrées
+
+### TMDB (The Movie Database)
+
+Extraction des films d'horreur via l'API TMDB.
+
+Données récupérées :
+
+* Identifiants TMDB
+* Titres et titres originaux
+* Résumés (overview)
+* Dates de sortie
+* Popularité
+* Notes et nombre de votes
+* Langue d'origine
+* Informations multimédias (posters, backdrops)
+
+### IMDb
+
+Utilisation des dumps officiels IMDb au format TSV.
+
+Données récupérées :
+
+* Films de type *movie*
+* Films appartenant au genre *Horror*
+* Année de sortie
+* Genres
+* Distribution principale (acteurs et actrices)
+
+### Rotten Tomatoes
+
+Collecte automatisée via Selenium.
+
+Données récupérées :
+
+* Tomatometer Score
+* Audience Score
+* Critics Consensus
+
+### Kaggle Movies Dataset
+
+Téléchargement automatisé du dataset *The Movies Dataset*.
+
+Données récupérées :
+
+* Titres
+* Synopsis
+* Taglines
+* Genres
+* Dates de sortie
+* Popularité
+* Notes utilisateurs
+
+### MovieLens 1M
+
+Téléchargement et intégration du dataset MovieLens.
+
+Données récupérées :
+
+* Films
+* Genres
+* Notes utilisateurs
+
+Des agrégations sont calculées afin d'obtenir :
+
+* Note moyenne
+* Nombre total d'évaluations
+
+## Technologies utilisées
+
+* Python
+* Polars
+* PySpark
+* Selenium
+* Requests
+* SQLite
+* Kaggle API
+
+## Architecture du Pipeline
+
+Le pipeline de données est organisé selon une architecture ETL moderne permettant de préparer un corpus de qualité pour les futures étapes de Retrieval-Augmented Generation (RAG).
+
+### 1. Ingestion
+
+Collecte automatisée des données depuis plusieurs sources :
+
+* TMDB API
+* IMDb Datasets
+* Rotten Tomatoes (Selenium Scraping)
+* Kaggle Movies Dataset
+* MovieLens 1M
+
+Les données brutes sont stockées dans le dossier :
+
+```text
+data/raw/
+```
+
+### 2. Normalisation
+
+Chaque source possède son propre module de normalisation.
+
+Objectifs :
+
+* Harmonisation des schémas de données
+* Uniformisation des noms de colonnes
+* Conversion des types de données
+* Extraction des années de sortie
+* Ajout d'informations de provenance (`source`)
+
+Modules :
+
+```text
+src/normalization/
+├── n_tmdb.py
+├── n_imdb.py
+├── n_kaggle.py
+├── n_movielens.py
+└── n_rotten.py
+```
+
+### 3. Cleaning
+
+Nettoyage et validation des données.
+
+Opérations réalisées :
+
+* Suppression des doublons
+* Validation des identifiants
+* Suppression des titres vides
+* Contrôle des années de sortie
+* Validation des notes et scores
+* Génération d'une clé normalisée (`title_key`)
+
+Les jeux de données nettoyés sont enregistrés dans :
+
+```text
+data/processed/
+```
+
+Formats générés :
+
+* Parquet (analyse et traitement)
+* CSV (contrôle manuel)
+
+### 4. Matching & Entity Resolution
+
+Les données provenant de différentes sources sont fusionnées afin d'identifier les films correspondant à une même entité.
+
+Méthodes utilisées :
+
+#### Exact Matching
+
+Correspondance basée sur :
+
+* title_key
+* year
+
+#### Fuzzy Matching
+
+Utilisation de RapidFuzz afin de détecter les correspondances proches entre les titres :
+
+Exemples :
+
+* The Shining ↔ The Shining (1980)
+* IT ↔ It
+* Halloween ↔ Halloween (1978)
+
+Cette étape permet de réduire les doublons entre les différentes bases de données.
+
+### 5. Construction du Gold Dataset
+
+Création d'une table consolidée contenant :
+
+* TMDB
+* IMDb
+* Kaggle
+* MovieLens
+
+Chaque film reçoit un identifiant interne :
+
+```text
+master_id
+```
+
+Le Gold Dataset constitue la source de vérité du projet.
+
+### 6. Enrichment Layer
+
+Après la fusion des données principales, un enrichissement est réalisé à partir de Rotten Tomatoes.
+
+Informations ajoutées :
+
+* Tomatometer Score
+* Audience Score
+* Critics Consensus
+
+Cette couche est séparée du processus de matching afin de préserver l'intégrité des entités principales.
+
+### 7. Future Data Warehouse
+
+Le Gold Dataset sera chargé dans une base Supabase/PostgreSQL.
+
+Objectifs :
+
+* Stockage relationnel normalisé (3NF)
+* Recherche rapide
+* Intégration future avec pgvector
+* Support du moteur RAG
+
+---
+
+## Structure du projet
+
+```text
+src/
+├── ingestion/
+├── normalization/
+├── cleaning/
+├── matching/
+├── merging/
+├── enrichment/
+└── database/
+
+data/
+├── raw/
+├── processed/
+└── gold/
+```
+
+---
+
+## État d'avancement
+
+### Réalisé
+
+* Collecte automatisée depuis 5 sources de données
+* Téléchargement automatisé des datasets
+* Scraping Rotten Tomatoes
+* Normalisation des schémas
+* Nettoyage des données
+* Export Parquet et CSV
+* Construction des clés de matching
+* Matching exact entre les sources
+* Implémentation du fuzzy matching avec RapidFuzz
+* Construction du Gold Dataset
+* Mise en place de la couche d'enrichissement Rotten Tomatoes
+
+### En cours
+
+* Optimisation du matching fuzzy
+* Génération d'identifiants maîtres (Master IDs)
+* Contrôle qualité des correspondances
+* Déduplication avancée
+
+### À venir
+
+* Modélisation Merise (MCD / MLD / MPD)
+* Création de la base Supabase
+* Intégration SQLAlchemy
+* Chargement automatisé des données
+* Génération des embeddings
+* Mise en place du moteur RAG
+* Développement de l'agent conversationnel HorRAGor
+
+```
+```
