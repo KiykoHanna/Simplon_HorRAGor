@@ -12,3 +12,8 @@ wheels/
 data
 data/
 
+*.parquet
+*.db
+*.csv
+.env
+__pycache__/
