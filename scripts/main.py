@@ -1,11 +1,13 @@
 from pathlib import Path
 
-from src.cleaning.movie_cleaner import process_all_sources
-from src.matching.build_gold_dataset import build_gold_dataset_pipeline
+
+
+from src.clearning.movie_clean import process_all_sources
+from src.merging.build_gold_dataset import build_gold_dataset_pipeline
 
 from database.load_gold import load_gold_to_supabase  
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]   
 
 RAW_DIR = ROOT / "data" / "raw"
 PROCESSED_DIR = ROOT / "data" / "processed"
@@ -39,12 +41,14 @@ def run_gold():
 
 def run_supabase_load():
     print("\n=== SUPABASE LOAD ===")
-    load_gold_to_supabase()   # 👈 ВАЖНО
-
+    load_gold_to_supabase()  
 
 def main():
     print("\nHorRAGor ETL Pipeline\n")
-
+    print("FILE:", __file__)
+    print("ROOT:", ROOT)
+    print("PROCESSED_DIR:", PROCESSED_DIR)
+    print("EXISTS:", PROCESSED_DIR.exists())
     # 1. INGESTION + CLEANING
     if not processed_exists():
         print("Processed datasets not found.")

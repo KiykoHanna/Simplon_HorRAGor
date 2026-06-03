@@ -254,7 +254,75 @@ data/
 ├── raw/
 ├── processed/
 └── gold/
+
+scripts/
+├── main.py
 ```
 
 ---
 
+### Exécution et vérification de la base de données (Supabase)
+
+1. Prérequis
+
+Avant de lancer le projet, vérifier :
+- Installation des dépendances 
+    - uv sync
+- Variables d’environnement 
+
+```text
+TMDB_API_KEY=9f9934a1803dfed644f1be14add420d0
+
+TMDB_URL="https://api.themoviedb.org/3"
+
+SUPABASE_URL="https://pghaqpdcdvfrwbhcgksl.supabase.co"
+SUPABASE_KEY="sb_publishable__QdCTceUQQvkIScuerrT9Q_dRFmPr_v"
+```
+
+2. Lancement du pipeline ETL
+
+```python
+python -m scripts.main
+```
+Le pipeline exécute les étapes suivantes :
+
+- Vérification / création des données nettoyées (processed/)
+- Construction du dataset gold (gold/)
+- Chargement des données dans Supabase
+
+3. Vérification des données locales
+
+Données traitées (processed)
+
+Chemin : data/processed/
+
+Fichiers attendus :
+
+- tmdb_clean.parquet
+- imdb_clean.parquet
+- kaggle_clean.parquet
+- movielens_clean.parquet
+
+Dataset final (gold)
+
+Chemin : data/gold/
+
+Fichier attendu :
+
+- gold_movies.parquet
+
+4. Vérification dans Supabase
+
+Vérifier le nombre de lignes
+
+Dans le SQL Editor :
+```sql
+SELECT COUNT(*) FROM movies;
+```
+```sql
+SELECT master_id, COUNT(*)
+FROM movies_gold
+GROUP BY master_id
+HAVING COUNT(*) > 1;
+SELECT COUNT(*) FROM movies;
+```
